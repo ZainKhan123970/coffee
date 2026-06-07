@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milstead & Co. — Seattle's Finest Coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --espresso: #1a0f0a;
+    --dark-roast: #2c1a0e;
+    --medium-roast: #4a2c1a;
+    --light-roast: #7a4e2d;
+    --caramel: #b8763a;
+    --gold: #c9933a;
+    --cream: #f5ede0;
+    --latte: #e8d5b7;
+    --foam: #faf6f0;
+    --white: #ffffff;
+    --text-dark: #1a0f0a;
+    --text-mid: #4a2c1a;
+    --text-light: #7a6050;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--foam);
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* ── PRELOADER ── */
+  #preloader {
+    position: fixed; inset: 0;
+    background: var(--espresso);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #preloader.hide { opacity: 0; visibility: hidden; }
+
+  .preloader-cup { width: 60px; height: 60px; position: relative; margin-bottom: 24px; }
+  .preloader-cup svg { width: 100%; height: 100%; }
+  .steam-line {
+    position: absolute; width: 3px; background: var(--caramel);
+    border-radius: 2px; animation: steamRise 1.4s ease-in-out infinite;
+  }
+  .steam-line:nth-child(1) { height: 20px; left: 16px; top: -22px; animation-delay: 0s; }
+  .steam-line:nth-child(2) { height: 14px; left: 28px; top: -16px; animation-delay: 0.3s; }
+  .steam-line:nth-child(3) { height: 18px; left: 40px; top: -20px; animation-delay: 0.6s; }
+  @keyframes steamRise {
+    0% { transform: translateY(0) scaleY(1); opacity: 0.8; }
+    100% { transform: translateY(-18px) scaleY(0.5); opacity: 0; }
+  }
+  .preloader-text {
+    font-family: 'Playfair Display', serif;
+    color: var(--latte); font-size: 14px; letter-spacing: 6px; text-transform: uppercase;
+  }
+  .preloader-bar {
+    width: 160px; height: 1px; background: rgba(255,255,255,0.1);
+    margin-top: 20px; position: relative; overflow: hidden;
+  }
+  .preloader-bar::after {
+    content: ''; position: absolute; inset: 0;
+    background: var(--caramel); transform: translateX(-100%);
+    animation: barFill 2s ease forwards;
+  }
+  @keyframes barFill { to { transform: translateX(0); } }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 24px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(26, 15, 10, 0.95); backdrop-filter: blur(20px);
+    padding: 16px 60px; border-bottom: 1px solid rgba(185,118,58,0.2);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+    color: var(--white); letter-spacing: 1px; text-decoration: none;
+  }
+  .nav-logo span { color: var(--caramel); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); text-decoration: none;
+    transition: color 0.3s; position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px; background: var(--caramel); transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--espresso); background: var(--caramel);
+    padding: 10px 28px; text-decoration: none; transition: all 0.3s; font-weight: 500;
+  }
+  .nav-cta:hover { background: var(--gold); transform: translateY(-1px); }
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index: 1001; }
+  .nav-hamburger span { display: block; width: 26px; height: 1.5px; background: var(--white); transition: all 0.3s; }
+
+  /* ── HERO ── */
+  #hero {
+    height: 100vh; min-height: 700px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; background: var(--espresso);
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1800&q=80') center/cover no-repeat;
+    filter: brightness(0.35) saturate(0.6);
+    transform: scale(1.08); animation: heroZoom 20s ease-in-out infinite alternate;
+  }
+  @keyframes heroZoom { from { transform: scale(1.08); } to { transform: scale(1.15); } }
+  .hero-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.3; pointer-events: none;
+  }
+  .hero-line-left {
+    position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 0;
+    background: linear-gradient(to bottom, transparent, var(--caramel), transparent);
+    animation: lineGrow 2s 2.5s ease forwards;
+  }
+  @keyframes lineGrow { to { height: 200px; } }
+  .hero-content { position: relative; z-index: 2; text-align: center; max-width: 900px; padding: 0 40px; }
+  .hero-badge {
+    display: inline-block; font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--caramel); border: 1px solid rgba(185,118,58,0.4); padding: 8px 24px;
+    margin-bottom: 40px; opacity: 0; animation: fadeUp 0.8s 2.8s ease forwards;
+  }
+  .hero-h1 {
+    font-family: 'Playfair Display', serif; font-size: clamp(52px, 8vw, 110px);
+    font-weight: 900; color: var(--white); line-height: 0.95;
+    letter-spacing: -2px; margin-bottom: 30px;
+  }
+  .hero-h1 .line { display: block; overflow: hidden; }
+  .hero-h1 .line span { display: block; transform: translateY(110%); animation: slideUp 1s ease forwards; }
+  .hero-h1 .line:nth-child(1) span { animation-delay: 3s; }
+  .hero-h1 .line:nth-child(2) span { animation-delay: 3.2s; color: var(--caramel); font-style: italic; }
+  .hero-h1 .line:nth-child(3) span { animation-delay: 3.4s; }
+  @keyframes slideUp { to { transform: translateY(0); } }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300;
+    color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-bottom: 50px;
+    opacity: 0; animation: fadeUp 0.8s 3.8s ease forwards;
+  }
+  .hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 4s ease forwards; }
+  .btn-primary {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    background: var(--caramel); color: var(--espresso); font-weight: 600;
+    padding: 16px 44px; text-decoration: none; transition: all 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; inset: 0; background: var(--gold);
+    transform: translateX(-100%); transition: transform 0.3s ease;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-outline {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    border: 1px solid rgba(255,255,255,0.4); color: var(--white); font-weight: 400;
+    padding: 16px 44px; text-decoration: none; transition: all 0.3s;
+  }
+  .btn-outline:hover { border-color: var(--caramel); color: var(--caramel); }
+  .hero-scroll {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeUp 1s 4.5s ease forwards; cursor: pointer;
+  }
+  .hero-scroll span { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .scroll-line { width: 1px; height: 50px; background: rgba(255,255,255,0.2); position: relative; overflow: hidden; }
+  .scroll-line::after {
+    content: ''; position: absolute; top: -100%; left: 0;
+    width: 100%; height: 100%; background: var(--caramel);
+    animation: scrollAnim 2s 5s ease infinite;
+  }
+  @keyframes scrollAnim { 0% { top: -100%; } 100% { top: 100%; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── MARQUEE ── */
+  .marquee-section { background: var(--caramel); padding: 16px 0; overflow: hidden; }
+  .marquee-track { display: flex; white-space: nowrap; animation: marquee 25s linear infinite; }
+  .marquee-item {
+    font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+    color: var(--espresso); font-weight: 600; padding: 0 40px;
+  }
+  .marquee-dot { color: rgba(26,15,10,0.4); margin: 0 20px; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ── ABOUT ── */
+  #about {
+    padding: 140px 60px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 100px; align-items: center;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .about-images { position: relative; height: 600px; }
+  .about-img-main { position: absolute; right: 0; top: 0; width: 75%; height: 80%; overflow: hidden; }
+  .about-img-main img, .about-img-accent img {
+    width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease;
+  }
+  .about-img-main:hover img, .about-img-accent:hover img { transform: scale(1.05); }
+  .about-img-accent {
+    position: absolute; left: 0; bottom: 0; width: 55%; height: 55%;
+    overflow: hidden; border: 6px solid var(--foam);
+  }
+  .about-year-tag {
+    position: absolute; right: -20px; top: 40%; background: var(--caramel);
+    color: var(--white); writing-mode: vertical-rl;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    padding: 20px 10px; font-family: 'Jost', sans-serif;
+  }
+  .section-label {
+    font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--caramel);
+    margin-bottom: 20px; display: flex; align-items: center; gap: 16px;
+  }
+  .section-label::before { content: ''; width: 30px; height: 1px; background: var(--caramel); }
+  .section-h2 {
+    font-family: 'Playfair Display', serif; font-size: clamp(36px, 4vw, 56px);
+    font-weight: 700; line-height: 1.1; color: var(--text-dark); margin-bottom: 30px;
+  }
+  .section-h2 em { font-style: italic; color: var(--caramel); }
+  .about-text {
+    font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300;
+    line-height: 1.9; color: var(--text-light); margin-bottom: 24px;
+  }
+  .about-stats {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 30px; margin-top: 50px;
+    padding-top: 40px; border-top: 1px solid rgba(74,44,26,0.1);
+  }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; color: var(--caramel); line-height: 1; }
+  .stat-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-light); margin-top: 6px; }
+
+  /* ── MENU ── */
+  #menu { background: var(--espresso); padding: 140px 60px; position: relative; overflow: hidden; }
+  #menu::before {
+    content: 'MENU'; position: absolute; right: -60px; top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: 'Playfair Display', serif; font-size: 200px; font-weight: 900;
+    color: rgba(255,255,255,0.02); white-space: nowrap; pointer-events: none;
+  }
+  .menu-header { text-align: center; max-width: 600px; margin: 0 auto 80px; }
+  .menu-header .section-label { justify-content: center; }
+  .menu-header .section-label::before { display: none; }
+  .menu-header .section-h2 { color: var(--white); }
+  .menu-header p { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: rgba(255,255,255,0.5); line-height: 1.8; }
+  .menu-tabs {
+    display: flex; justify-content: center; gap: 0; margin-bottom: 60px;
+    border: 1px solid rgba(255,255,255,0.1); width: fit-content; margin-left: auto; margin-right: auto;
+  }
+  .menu-tab {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.4); padding: 12px 30px; cursor: pointer;
+    border: none; background: none; transition: all 0.3s; font-family: 'Jost', sans-serif;
+  }
+  .menu-tab.active, .menu-tab:hover { background: var(--caramel); color: var(--espresso); }
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; max-width: 1300px; margin: 0 auto; }
+  .menu-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    overflow: hidden; transition: all 0.4s ease; cursor: pointer; position: relative;
+  }
+  .menu-card::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--caramel); opacity: 0; transition: opacity 0.3s; }
+  .menu-card:hover { transform: translateY(-6px); background: rgba(255,255,255,0.07); }
+  .menu-card:hover::after { opacity: 1; }
+  .menu-card-img { height: 200px; overflow: hidden; }
+  .menu-card-img img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s ease; filter: saturate(0.8);
+  }
+  .menu-card:hover .menu-card-img img { transform: scale(1.08); filter: saturate(1); }
+  .menu-card-body { padding: 24px 28px; }
+  .menu-card-name { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--white); margin-bottom: 8px; }
+  .menu-card-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.7; margin-bottom: 20px; }
+  .menu-card-footer { display: flex; justify-content: space-between; align-items: center; }
+  .menu-price { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: var(--caramel); }
+  .menu-add {
+    width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.2);
+    background: none; color: var(--white); font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.3s;
+  }
+  .menu-add:hover { background: var(--caramel); border-color: var(--caramel); color: var(--espresso); }
+
+  /* ── WHY US ── */
+  #why { padding: 140px 60px; max-width: 1400px; margin: 0 auto; }
+  .why-header { text-align: center; max-width: 600px; margin: 0 auto 90px; }
+  .why-header .section-label { justify-content: center; }
+  .why-header .section-label::before { display: none; }
+  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid rgba(74,44,26,0.12); }
+  .why-card {
+    padding: 50px 40px; border-right: 1px solid rgba(74,44,26,0.12);
+    position: relative; overflow: hidden; transition: all 0.4s ease;
+  }
+  .why-card:last-child { border-right: none; }
+  .why-card::before {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 100%; height: 0; background: var(--espresso);
+    transition: height 0.4s ease; z-index: 0;
+  }
+  .why-card:hover::before { height: 100%; }
+  .why-card > * { position: relative; z-index: 1; }
+  .why-icon { font-size: 36px; margin-bottom: 28px; display: block; transition: transform 0.4s ease; }
+  .why-card:hover .why-icon { transform: scale(1.2); }
+  .why-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; margin-bottom: 16px; transition: color 0.4s; }
+  .why-card:hover .why-title { color: var(--white); }
+  .why-desc { font-size: 14px; line-height: 1.8; color: var(--text-light); transition: color 0.4s; }
+  .why-card:hover .why-desc { color: rgba(255,255,255,0.6); }
+
+  /* ── GALLERY ── */
+  #gallery { background: var(--dark-roast); padding: 140px 0; }
+  .gallery-header { text-align: center; max-width: 600px; margin: 0 auto 80px; padding: 0 60px; }
+  .gallery-header .section-label { justify-content: center; }
+  .gallery-header .section-label::before { display: none; }
+  .gallery-header .section-h2 { color: var(--white); }
+  .gallery-grid {
+    display: grid; grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 260px 260px; gap: 6px; padding: 0 6px;
+  }
+  .gal-item { overflow: hidden; position: relative; cursor: pointer; }
+  .gal-item:nth-child(1) { grid-column: 1/5; grid-row: 1/2; }
+  .gal-item:nth-child(2) { grid-column: 5/9; grid-row: 1/3; }
+  .gal-item:nth-child(3) { grid-column: 9/13; grid-row: 1/2; }
+  .gal-item:nth-child(4) { grid-column: 1/4; grid-row: 2/3; }
+  .gal-item:nth-child(5) { grid-column: 4/6; grid-row: 2/3; }
+  .gal-item:nth-child(6) { grid-column: 9/13; grid-row: 2/3; }
+  .gal-item img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+    filter: brightness(0.85) saturate(0.7);
+  }
+  .gal-item:hover img { transform: scale(1.1); filter: brightness(1) saturate(1); }
+  .gal-item::after {
+    content: '+'; position: absolute; inset: 0;
+    background: rgba(26,15,10,0.4); display: flex; align-items: center; justify-content: center;
+    font-size: 36px; color: var(--white); font-family: 'Playfair Display', serif;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .gal-item:hover::after { opacity: 1; }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials { padding: 140px 60px; max-width: 1200px; margin: 0 auto; }
+  .test-header { text-align: center; max-width: 500px; margin: 0 auto 80px; }
+  .test-header .section-label { justify-content: center; }
+  .test-header .section-label::before { display: none; }
+  .test-slider { position: relative; overflow: hidden; }
+  .test-track { display: flex; transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .test-card { min-width: 100%; padding: 0 80px; text-align: center; }
+  .test-stars { color: var(--caramel); font-size: 18px; margin-bottom: 30px; letter-spacing: 4px; }
+  .test-quote {
+    font-family: 'Playfair Display', serif; font-size: clamp(20px, 2.5vw, 30px);
+    font-style: italic; font-weight: 400; color: var(--text-dark); line-height: 1.6; margin-bottom: 40px;
+  }
+  .test-quote::before { content: '\201C'; }
+  .test-quote::after { content: '\201D'; }
+  .test-name { font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--caramel); }
+  .test-subtitle { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+  .test-nav { display: flex; justify-content: center; gap: 12px; margin-top: 60px; }
+  .test-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(74,44,26,0.2); cursor: pointer; transition: all 0.3s; border: none;
+  }
+  .test-dot.active { background: var(--caramel); width: 30px; border-radius: 4px; }
+  .test-arrows {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 100%; display: flex; justify-content: space-between; pointer-events: none;
+  }
+  .test-arrow {
+    width: 48px; height: 48px; border: 1px solid rgba(74,44,26,0.2);
+    background: var(--foam); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; pointer-events: all; transition: all 0.3s; font-size: 18px; color: var(--text-dark);
+  }
+  .test-arrow:hover { background: var(--caramel); border-color: var(--caramel); color: var(--white); }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--espresso); padding: 140px 60px; }
+  .contact-inner { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; }
+  .contact-info .section-h2 { color: var(--white); margin-bottom: 30px; }
+  .contact-desc { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 50px; }
+  .contact-detail { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 30px; }
+  .contact-icon { width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .contact-detail-text h4 { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); margin-bottom: 4px; }
+  .contact-detail-text p { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+  .contact-socials { display: flex; gap: 12px; margin-top: 40px; }
+  .social-link {
+    width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.5); text-decoration: none; font-size: 13px;
+    letter-spacing: 1px; transition: all 0.3s; font-weight: 500;
+  }
+  .social-link:hover { border-color: var(--caramel); color: var(--caramel); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+  .form-group input, .form-group textarea {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    padding: 14px 18px; color: var(--white); font-family: 'Jost', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.3s; -webkit-appearance: none;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--caramel); }
+  .form-group textarea { height: 130px; resize: none; }
+  .form-submit {
+    width: 100%; background: var(--caramel); color: var(--espresso); border: none; padding: 16px;
+    font-size: 12px; letter-spacing: 4px; text-transform: uppercase;
+    font-family: 'Jost', sans-serif; font-weight: 600; cursor: pointer; transition: background 0.3s;
+  }
+  .form-submit:hover { background: var(--gold); }
+  .map-embed { width: 100%; height: 250px; margin-top: 16px; border: 0; filter: saturate(0.5) contrast(0.8); }
+
+  /* ── FOOTER ── */
+  footer { background: #0f0806; padding: 60px; }
+  .footer-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px; padding-bottom: 50px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-brand p { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: rgba(255,255,255,0.4); line-height: 1.8; margin-top: 20px; max-width: 280px; }
+  .footer-heading { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--caramel); margin-bottom: 24px; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 12px; }
+  .footer-links a { font-size: 14px; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--caramel); }
+  .footer-bottom {
+    max-width: 1400px; margin: 0 auto; padding-top: 30px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: rgba(255,255,255,0.25);
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(40px); transition: all 0.9s cubic-bezier(0.25,0.46,0.45,0.94); }
+  .reveal.revealed { opacity: 1; transform: translateY(0); }
+  .reveal-left { opacity: 0; transform: translateX(-40px); transition: all 0.9s ease; }
+  .reveal-left.revealed { opacity: 1; transform: translateX(0); }
+  .reveal-right { opacity: 0; transform: translateX(40px); transition: all 0.9s ease; }
+  .reveal-right.revealed { opacity: 1; transform: translateX(0); }
+
+  /* ── DARK MODE ── */
+  body.dark-mode { background: #0f0806; }
+  body.dark-mode #about, body.dark-mode #why, body.dark-mode #testimonials { background: #0f0806; }
+  body.dark-mode .why-card { background: rgba(255,255,255,0.02); }
+  body.dark-mode .why-title, body.dark-mode .section-h2 { color: var(--foam); }
+  body.dark-mode .why-desc, body.dark-mode .about-text { color: rgba(255,255,255,0.4); }
+  body.dark-mode .test-quote { color: var(--latte); }
+  body.dark-mode .stat-label { color: rgba(255,255,255,0.4); }
+  body.dark-mode .test-arrow { background: #1a0f0a; border-color: rgba(255,255,255,0.1); color: var(--foam); }
+  body.dark-mode .about-img-accent { border-color: #0f0806; }
+
+  .dark-toggle {
+    position: fixed; bottom: 40px; right: 40px; width: 48px; height: 48px;
+    background: var(--caramel); border: none; border-radius: 50%;
+    cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
+    z-index: 900; box-shadow: 0 8px 30px rgba(185,118,58,0.4); transition: all 0.3s;
+  }
+  .dark-toggle:hover { transform: scale(1.1); }
+
+  /* ── MOBILE ── */
+  .mobile-menu {
+    position: fixed; inset: 0; background: var(--espresso); z-index: 990;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 30px;
+    transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.77,0,0.175,1);
+  }
+  .mobile-menu.open { transform: translateX(0); }
+  .mobile-menu a { font-family: 'Playfair Display', serif; font-size: 36px; color: var(--white); text-decoration: none; transition: color 0.3s; }
+  .mobile-menu a:hover { color: var(--caramel); }
+
+  @media (max-width: 1024px) {
+    #about { grid-template-columns: 1fr; gap: 60px; }
+    .about-images { height: 400px; order: -1; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); }
+    .why-card { border-bottom: 1px solid rgba(74,44,26,0.12); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    nav.scrolled { padding: 14px 24px; }
+    .nav-links, .nav-cta { display: none; }
+    .nav-hamburger { display: flex; }
+    #about, #why, #contact, #testimonials, #menu { padding: 80px 24px; }
+    #gallery { padding: 80px 0; }
+    footer { padding: 60px 24px; }
+    .gallery-grid { grid-template-columns: repeat(2,1fr); grid-template-rows: auto; }
+    .gal-item { grid-column: auto !important; grid-row: auto !important; height: 200px; }
+    .why-grid { grid-template-columns: 1fr; }
+    .contact-inner { grid-template-columns: 1fr; gap: 60px; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+    .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
+    .test-card { padding: 0 20px; }
+    .test-arrows { display: none; }
+    .hero-line-left { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="preloader-cup">
+    <div class="steam-line"></div><div class="steam-line"></div><div class="steam-line"></div>
+    <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 28h40l-4 20H14L10 28z" fill="#4a2c1a" stroke="#7a4e2d" stroke-width="1.5"/>
+      <path d="M50 32h4a4 4 0 010 8h-4" stroke="#7a4e2d" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M8 28h44" stroke="#7a4e2d" stroke-width="1.5"/>
+      <rect x="16" y="48" width="28" height="3" rx="1.5" fill="#4a2c1a"/>
+    </svg>
+  </div>
+  <div class="preloader-text">Milstead & Co.</div>
+  <div class="preloader-bar"></div>
+</div>
+
+<button class="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">☽</button>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#menu" onclick="closeMobile()">Menu</a>
+  <a href="#gallery" onclick="closeMobile()">Gallery</a>
+  <a href="#testimonials" onclick="closeMobile()">Reviews</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+</div>
+
+<nav id="navbar">
+  <a href="#" class="nav-logo">Milstead<span>&</span>Co.</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Order Now</a>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grain"></div>
+  <div class="hero-line-left"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Est. Seattle · Fremont · Since 2012</div>
+    <h1 class="hero-h1">
+      <span class="line"><span>Freshly</span></span>
+      <span class="line"><span>Brewed</span></span>
+      <span class="line"><span>Happiness</span></span>
+    </h1>
+    <p class="hero-sub">In every cup, in every corner, in every sip.</p>
+    <div class="hero-buttons">
+      <a href="#menu" class="btn-primary"><span>Explore Menu</span></a>
+      <a href="#about" class="btn-outline">Our Story</a>
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">Single Origin Espresso</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Artisan Cold Brew</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Handcrafted Lattes</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Fresh Pastries Daily</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Seattle's Finest Roasts</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">4.6 Stars · 1,200+ Reviews</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Single Origin Espresso</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Artisan Cold Brew</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Handcrafted Lattes</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Fresh Pastries Daily</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">Seattle's Finest Roasts</span><span class="marquee-dot">◆</span>
+    <span class="marquee-item">4.6 Stars · 1,200+ Reviews</span><span class="marquee-dot">◆</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-images reveal-left">
+    <div class="about-img-main">
+      <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800&q=80" alt="Milstead cafe interior">
+    </div>
+    <div class="about-img-accent">
+      <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=600&q=80" alt="Barista at work">
+    </div>
+    <div class="about-year-tag">Since 2012</div>
+  </div>
+  <div class="reveal-right">
+    <div class="section-label">Our Story</div>
+    <h2 class="section-h2">Where <em>craft</em> meets<br>community</h2>
+    <p class="about-text">Milstead & Co. was born from a simple belief: that great coffee is worth obsessing over. Nestled in Seattle's vibrant Fremont neighborhood, we've been serving exceptional brews since 2012 — featuring rotating roasters and single-origin beans sourced from the world's finest farms.</p>
+    <p class="about-text">Art lines our walls, water frames our windows, and every cup is made with the intention of creating something truly memorable. We don't just pour coffee — we tell a story in every sip.</p>
+    <div class="about-stats">
+      <div><div class="stat-num">12+</div><div class="stat-label">Rotating Roasters</div></div>
+      <div><div class="stat-num">4.6</div><div class="stat-label">Star Rating</div></div>
+      <div><div class="stat-num">1.2K</div><div class="stat-label">Happy Reviews</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="menu-header reveal">
+    <div class="section-label" style="justify-content:center">Our Menu</div>
+    <h2 class="section-h2">Crafted with<br><em>intention</em></h2>
+    <p>Every item is prepared with the highest quality ingredients and the utmost care by our expert baristas.</p>
+  </div>
+  <div class="menu-tabs reveal">
+    <button class="menu-tab active" onclick="filterMenu('all',this)">All</button>
+    <button class="menu-tab" onclick="filterMenu('espresso',this)">Espresso</button>
+    <button class="menu-tab" onclick="filterMenu('cold',this)">Cold Drinks</button>
+    <button class="menu-tab" onclick="filterMenu('food',this)">Pastries</button>
+  </div>
+  <div class="menu-grid" id="menuGrid">
+    <div class="menu-card reveal" data-cat="espresso">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600&q=80" alt="Latte"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Signature Latte</div>
+        <div class="menu-card-desc">Velvety microfoam, double shot espresso, your choice of milk. A daily ritual.</div>
+        <div class="menu-card-footer"><span class="menu-price">$3.95+</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="espresso">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80" alt="Cortado"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Cortado</div>
+        <div class="menu-card-desc">Equal parts espresso and steamed milk — bold, balanced, beautiful.</div>
+        <div class="menu-card-footer"><span class="menu-price">$4.50</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="espresso">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1485808191679-5f86510bd652?w=600&q=80" alt="Espresso"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Single Origin Espresso</div>
+        <div class="menu-card-desc">Bright, fruity, and tart. Rotates seasonally from top roasters worldwide.</div>
+        <div class="menu-card-footer"><span class="menu-price">$3.50</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="cold">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80" alt="Cold Brew"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Cold Brew</div>
+        <div class="menu-card-desc">12-hour slow-steeped, ultra-smooth, served over hand-chipped ice.</div>
+        <div class="menu-card-footer"><span class="menu-price">$6.00</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="cold">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=600&q=80" alt="Matcha"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Matcha Latte</div>
+        <div class="menu-card-desc">Ceremonial-grade matcha whisked into creamy oat milk, served hot or iced.</div>
+        <div class="menu-card-footer"><span class="menu-price">$5.75</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="cold">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1499638673689-79a0b5115d87?w=600&q=80" alt="Iced Latte"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Iced Latte</div>
+        <div class="menu-card-desc">Double shot over ice, finished with cold whole milk and a hint of vanilla.</div>
+        <div class="menu-card-footer"><span class="menu-price">$5.25</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="food">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80" alt="Croissant"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Almond Croissant</div>
+        <div class="menu-card-desc">Twice-baked with frangipane cream, dusted in powdered sugar and toasted almonds.</div>
+        <div class="menu-card-footer"><span class="menu-price">$4.75</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="food">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&q=80" alt="Scone"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Buttermilk Scone</div>
+        <div class="menu-card-desc">Flaky, golden, and generously sized. Baked fresh each morning in-house.</div>
+        <div class="menu-card-footer"><span class="menu-price">$3.75</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+    <div class="menu-card reveal" data-cat="espresso">
+      <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80" alt="Hot Chocolate"></div>
+      <div class="menu-card-body">
+        <div class="menu-card-name">Spinnaker 70 Hot Choc</div>
+        <div class="menu-card-desc">70% dark chocolate blend, steamed to silky perfection. Pure indulgence.</div>
+        <div class="menu-card-footer"><span class="menu-price">$6.05</span><button class="menu-add">+</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="why-header reveal">
+    <div class="section-label">Why Choose Us</div>
+    <h2 class="section-h2">The Milstead<br><em>difference</em></h2>
+  </div>
+  <div class="why-grid">
+    <div class="why-card reveal">
+      <span class="why-icon">🫘</span>
+      <div class="why-title">Premium Beans</div>
+      <p class="why-desc">We rotate through 12+ of the world's finest roasters, featuring bright, fruity, and complex single-origin profiles.</p>
+    </div>
+    <div class="why-card reveal" style="transition-delay:0.1s">
+      <span class="why-icon">☕</span>
+      <div class="why-title">Expert Baristas</div>
+      <p class="why-desc">Our team trains obsessively in extraction science, milk texturing, and the art of the perfect cup — every time.</p>
+    </div>
+    <div class="why-card reveal" style="transition-delay:0.2s">
+      <span class="why-icon">🎨</span>
+      <div class="why-title">Curated Space</div>
+      <p class="why-desc">Art-lined walls, panoramic water views, and a warm atmosphere that makes every visit a true experience.</p>
+    </div>
+    <div class="why-card reveal" style="transition-delay:0.3s">
+      <span class="why-icon">🌿</span>
+      <div class="why-title">Community Roots</div>
+      <p class="why-desc">Proudly rooted in Fremont since 2012. We believe in building relationships, not just transactions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="gallery-header reveal">
+    <div class="section-label">Gallery</div>
+    <h2 class="section-h2">A glimpse of<br>our <em>world</em></h2>
+  </div>
+  <div class="gallery-grid">
+    <div class="gal-item reveal"><img src="https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=800&q=80" alt="Coffee art"></div>
+    <div class="gal-item reveal"><img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&q=80" alt="Cafe interior"></div>
+    <div class="gal-item reveal"><img src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?w=800&q=80" alt="Barista"></div>
+    <div class="gal-item reveal"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80" alt="Espresso machine"></div>
+    <div class="gal-item reveal"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80" alt="Coffee beans"></div>
+    <div class="gal-item reveal"><img src="https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=800&q=80" alt="Latte art"></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="test-header reveal">
+    <div class="section-label">Reviews</div>
+    <h2 class="section-h2">What our<br>guests <em>say</em></h2>
+  </div>
+  <div class="test-slider reveal">
+    <div class="test-track" id="testTrack">
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">Excellent coffee, delicious pastries, fast service, and a great location. Finally open for indoor dining again and it was absolutely worth the wait!</p>
+        <div class="test-name">Sarah M.</div><div class="test-subtitle">Verified Google Review</div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">Great quality chai latte and the baristas were very personable and kind! The atmosphere is warm, the art is beautiful — I would definitely come back again.</p>
+        <div class="test-name">James T.</div><div class="test-subtitle">Verified Google Review</div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">Awesome coffee shop with big windows and incredible views of the water and bridge. A true pilgrimage site for coffee nerds — the rotating single-origin selection is unmatched in Seattle.</p>
+        <div class="test-name">Emma R.</div><div class="test-subtitle">Condé Nast Traveler Feature</div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">I've traveled the world for coffee and Milstead remains one of my absolute favorites. The dedication to quality here is palpable in every single cup they serve.</p>
+        <div class="test-name">David K.</div><div class="test-subtitle">Verified Google Review</div>
+      </div>
+    </div>
+    <div class="test-arrows">
+      <button class="test-arrow" onclick="moveTest(-1)">←</button>
+      <button class="test-arrow" onclick="moveTest(1)">→</button>
+    </div>
+  </div>
+  <div class="test-nav" id="testNav">
+    <button class="test-dot active" onclick="goTest(0)"></button>
+    <button class="test-dot" onclick="goTest(1)"></button>
+    <button class="test-dot" onclick="goTest(2)"></button>
+    <button class="test-dot" onclick="goTest(3)"></button>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-info reveal-left">
+      <div class="section-label">Find Us</div>
+      <h2 class="section-h2">Come visit us<br>in <em>Fremont</em></h2>
+      <p class="contact-desc">We're open every day, brewing from early morning. Stop in for your daily ritual or discover a new favorite.</p>
+      <div class="contact-detail">
+        <div class="contact-icon">📍</div>
+        <div class="contact-detail-text"><h4>Address</h4><p>754 N 34th St, Seattle<br>WA 98103, United States</p></div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-icon">🕐</div>
+        <div class="contact-detail-text"><h4>Hours</h4><p>Mon–Fri: 7:00 AM – 4:00 PM<br>Sat–Sun: 8:00 AM – 4:00 PM</p></div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-icon">📞</div>
+        <div class="contact-detail-text"><h4>Phone</h4><p>+1 (206) 659-4814</p></div>
+      </div>
+      <div class="contact-socials">
+        <a class="social-link" href="https://www.instagram.com/milsteadandco" target="_blank">IG</a>
+        <a class="social-link" href="https://www.facebook.com/milsteadandco" target="_blank">FB</a>
+        <a class="social-link" href="https://milsteadandco.com" target="_blank">WW</a>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input type="text" placeholder="Jane"></div>
+        <div class="form-group"><label>Last Name</label><input type="text" placeholder="Doe"></div>
+      </div>
+      <div class="form-group"><label>Email Address</label><input type="email" placeholder="jane@example.com"></div>
+      <div class="form-group"><label>Subject</label><input type="text" placeholder="Event inquiry, feedback, catering..."></div>
+      <div class="form-group"><label>Message</label><textarea placeholder="Tell us how we can help you..."></textarea></div>
+      <button class="form-submit" id="submitBtn">Send Message →</button>
+      <iframe class="map-embed" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2688.3892285977834!2d-122.35058228435518!3d47.64985317918799!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5490158efaf85ca7%3A0x6c6edf04d3b1264c!2sMilstead%20%26%20Co.!5e0!3m2!1sen!2sus!4v1615000000000!5m2!1sen!2sus" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);font-weight:700;letter-spacing:1px;">Milstead<span style="color:var(--caramel)">&</span>Co.</div>
+      <p>Seattle's favorite neighborhood coffee shop. Serving exceptional brews in Fremont since 2012, with a rotating cast of the world's finest roasters.</p>
+    </div>
+    <div>
+      <div class="footer-heading">Navigate</div>
+      <ul class="footer-links">
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#menu">Our Menu</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Hours</div>
+      <ul class="footer-links">
+        <li><a>Mon–Fri: 7am–4pm</a></li>
+        <li><a>Saturday: 8am–4pm</a></li>
+        <li><a>Sunday: 8am–4pm</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Follow</div>
+      <ul class="footer-links">
+        <li><a href="https://www.instagram.com/milsteadandco" target="_blank">Instagram</a></li>
+        <li><a href="https://www.facebook.com/milsteadandco" target="_blank">Facebook</a></li>
+        <li><a href="https://milsteadandco.com" target="_blank">Website</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 Milstead & Co. All rights reserved.</span>
+    <span>754 N 34th St, Seattle WA 98103</span>
+  </div>
+</footer>
+
+<script>
+  // PRELOADER
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('preloader').classList.add('hide'), 2200);
+  });
+
+  // NAVBAR
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // SCROLL REVEAL
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => obs.observe(el));
+
+  // MENU FILTER
+  function filterMenu(cat, btn) {
+    document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.menu-card').forEach(c => {
+      c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+    });
+  }
+
+  // TESTIMONIAL SLIDER
+  let idx = 0;
+  function updateTest() {
+    document.getElementById('testTrack').style.transform = `translateX(-${idx * 100}%)`;
+    document.querySelectorAll('.test-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+  function moveTest(d) { idx = (idx + d + 4) % 4; updateTest(); }
+  function goTest(i) { idx = i; updateTest(); }
+  setInterval(() => moveTest(1), 5000);
+
+  // MOBILE MENU
+  function toggleMobile() { document.getElementById('mobileMenu').classList.toggle('open'); }
+  function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+  // DARK MODE
+  function toggleDark() {
+    document.body.classList.toggle('dark-mode');
+    document.querySelector('.dark-toggle').textContent = document.body.classList.contains('dark-mode') ? '☀' : '☽';
+  }
+
+  // ADD BUTTON FEEDBACK
+  document.querySelectorAll('.menu-add').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.textContent = '✓';
+      this.style.cssText = 'background:var(--caramel);border-color:var(--caramel);color:var(--espresso)';
+      setTimeout(() => { this.textContent = '+'; this.style.cssText = ''; }, 1200);
+    });
+  });
+
+  // FORM SUBMIT
+  document.getElementById('submitBtn').addEventListener('click', function() {
+    this.textContent = 'Message Sent ✓';
+    this.style.background = '#2c6e3a';
+    setTimeout(() => { this.textContent = 'Send Message →'; this.style.background = ''; }, 3000);
+  });
+</script>
+</body>
+</html>
